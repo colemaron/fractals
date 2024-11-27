@@ -56,15 +56,15 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
 		z = vec2<f32>(
 			z.x * z.x - z.y * z.y + c.x * in.ratio,
 			2.0 * z.x * z.y + c.y
-		) + in.transform + vec2<f32>(-0.5, 0.0);
+		) + in.transform;
 
 		if (z.x * z.x + z.y * z.y > 4.0) {
 			break;
 		}
 	}
 
-	let terminated = 1 - step(max, i);
-	let t = i / max / (100.0 / max) * terminated;
+	let m = 1 - step(max, i);
+	let t = i / 15;
 
-	return vec4<f32>(t, t / 5, 0.0, 1.0);
+	return vec4<f32>(sin(t + 1) * m, sin(t + 2) * m, sin(t + 3) * m, 1.0);
 }

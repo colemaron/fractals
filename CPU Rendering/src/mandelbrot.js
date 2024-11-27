@@ -1,29 +1,32 @@
+import { Vec2 } from "./Vector.js"
+
 self.onmessage = event => {
-	const { width, height, start, end, zoom, offsetX, offsetY, maxIterations } = event.data;
+	const { size, start, end, zoom, offset, maxIterations } = event.data;
 	const result = [];
 
 	const scale = 2 / zoom;
-	const ratio = width / height;
+	const ratio = size.x / size.y;
 
-	for (let y = 0; y < end - start; y++) {
-		for (let x = 0; x < width; x++) {
+	for (let y = start; y < end; y++) {
+		for (let x = 0; x < size.x; x++) {
 
 			// get complex coordinate
 
-			const cx = (x / width) * scale - (scale / 2) + offsetX;
-			const cy = ((y + start) / height) * scale - (scale / 2) + offsetY;
+			const c = new Vec2(
+				x / size.x * scale - (scale / 2) + offset.x,
+				y / size.y * scale - (scale / 2) + offset.y
+			)
 
 			// get iterations
 
-			let zx = 0;
-			let zy = 0;
-
+			let z = new Vec2();
 			let i = 0;
 
-			while (zx * zx + zy * zy < 4 && i < maxIterations) {
-				const x2 = zx * zx - zy * zy + cx * ratio;
-				zy = 2 * zx * zy + cy;
-				zx = x2;
+			while (z.magnitudeSquared < 4 && i < maxIterations) {
+				z.replace(
+					z.x * z.x - z.y * z.y + c.x * ratio,
+					2 * z.x * z.y + c.y
+				);
 
 				i++;
 			}
@@ -31,13 +34,14 @@ self.onmessage = event => {
 			// apply color
 
 			const m = i == maxIterations ? 0 : 255;
-			const t = i / 10;
+			const t = i / 25;
 
-			const r = Math.sin(t + 1) * m;
-			const g = Math.sin(t + 2) * m;
-			const b = Math.sin(t + 3.2) * m;
-
-			const color = [r, g, b, 255];
+			const color = [
+				Math.sin(t + 1) * m,
+				Math.sin(t + 2) * m,
+				Math.sin(t + 3) * m,
+				255
+			];
 			
 			result.push({ x, y, color });
 		}

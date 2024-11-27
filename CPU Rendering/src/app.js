@@ -1,3 +1,7 @@
+import { Vec2 } from "./Vector.js";
+
+// set up canvas
+
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d", {
 	willReadFrequently: true,
@@ -7,8 +11,6 @@ const ctx = canvas.getContext("2d", {
 
 const box = document.getElementById("box");
 
-let rendering = false;
-
 // constants
 
 let maxIterations = 1000;
@@ -17,22 +19,24 @@ let fidelity = 1;
 const zoomStepSpeed = 1.25;
 let zoomStep = 10;
 
-const workerCount = navigator.hardwareConcurrency * 10;
+const workerCount = navigator.hardwareConcurrency;
 const workers = [];
 let completedCount = 0;
 
 // view
 
 let zoom = 1;
-let offsetX = -0.5, offsetY = 0;
+let offset = new Vec2(-1.5437 + 0.75, 0);
 
 // resize canvas
+
+let size = new Vec2();
 
 function resize() {
 	const save = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-	canvas.width = window.innerWidth * fidelity;
-	canvas.height = window.innerHeight * fidelity;
+	size.x = canvas.width = window.innerWidth * fidelity;
+	size.y = canvas.height = window.innerHeight * fidelity;
 
 	ctx.putImageData(save, 0, 0);
 }
@@ -43,22 +47,16 @@ resize();
 
 // mouse move for zoom
 
-let mouseX = 0;
-let mouseY = 0;
+let mouse = new Vec2();
 
 function updateBox(event) {
-	if (event) {
-		mouseX = event.clientX;
-		mouseY = event.clientY;
-	}
+	if (event) { mouse.replace(event.clientX, event.clientY); }
 
-	if (!rendering) {
-		box.style.left = mouseX + "px";
-		box.style.top = mouseY + "px";
+	box.style.left = mouse.x + "px";
+	box.style.top = mouse.y + "px";
 
-		box.style.width = window.innerWidth / zoomStep + "px";
-		box.style.height = window.innerHeight / zoomStep + "px";
-	}
+	box.style.width = window.innerWidth / zoomStep + "px";
+	box.style.height = window.innerHeight / zoomStep + "px";
 }
 
 canvas.addEventListener("mousemove", updateBox);
@@ -66,25 +64,23 @@ canvas.addEventListener("mousemove", updateBox);
 // worker function
 
 function createWorker(start, end) {
-	const worker = new Worker("src/mandelbrot.js");
+	const worker = new Worker("src/mandelbrot.js", { type: "module" });
 	workers.push(worker);
 
 	worker.postMessage({
-		width: canvas.width,
-		height: canvas.height,
+		size,
 		start,
 		end,
 		zoom,
-		offsetX,
-		offsetY,
+		offset,
 		maxIterations
 	});
 
 	worker.onmessage = event => {
-		const image = ctx.createImageData(canvas.width, end - start);
+		const image = ctx.createImageData(size.x, end - start);
 
 		event.data.forEach(({ x, y, color }) => {
-			const i = (y * canvas.width + x) * 4;
+			const i = ((y - start) * size.x + x) * 4;
 
 			image.data[i + 0] = color[0];
 			image.data[i + 1] = color[1];
@@ -98,8 +94,6 @@ function createWorker(start, end) {
 
 		if (completedCount == workerCount) {
 			completedCount = 0;
-			rendering = false;
-
 			state.textContent = "IDLE";
 
 			updateBox();
@@ -114,21 +108,21 @@ function createWorker(start, end) {
 const state = document.getElementById("state");
 
 function render() {
-	rendering = true;
+	// reset workers
+
+	workers.forEach(worker => worker.terminate());
+	workers.length = 0;
+	completedCount = 0;
+
+	// dispatch workers
 	
 	state.textContent = "RENDERING...";
 
-	workers.forEach(worker => {
-		worker.terminate();
-		completedCount = 0;
-		rendering = false;
-	})
+	const step = Math.ceil(size.y / workerCount);
 
-	const size = Math.ceil(canvas.height / workerCount);
-
-	for (let i = 0; i < workerCount; i++) {
-		const start = i * size;
-		const end = Math.min((i + 1) * size, canvas.height);
+	for (let y = 0; y < workerCount; y++) {
+		const start = y * step;
+		const end = Math.min((y + 1) * step, size.y);
 
 		createWorker(start, end);
 	}
@@ -139,24 +133,19 @@ render();
 // click zooming
 
 canvas.addEventListener("mousedown", event => {
-	if (event.which === 1) {
-		const mx = event.clientX / canvas.width * fidelity - 0.5;
-		const my = event.clientY / canvas.height * fidelity - 0.5;
+	if (event.button === 0) {
+		let m = new Vec2(
+			event.clientX / size.x * fidelity - 0.5,
+			event.clientY / size.y * fidelity - 0.5
+		).mul(2 / zoom);
 
-		const cx = mx * 2 / zoom + offsetX;
-		const cy = my * 2 / zoom + offsetY;
-
-		const dx = cx - offsetX;
-		const dy = cy - offsetY;
-
-		offsetX += dx;
-		offsetY += dy;
+		offset = offset.add(m);
 
 		zoom *= zoomStep;
 
 		render();
 		updateBox(event);
-	} else if (event.which === 3) {
+	} else if (event.button === 2) {
 		zoom /= zoomStep;
 
 		render();

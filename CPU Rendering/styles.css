@@ -26,15 +26,12 @@ canvas {
 }
 
 #box {
-	box-sizing: border-box;
-
 	position: fixed;
 	top: 0;
 	left: 0;
-
 	translate: -50% -50%;
 	
-	border: 1px solid white;
+	border: 2px solid white;
 
 	pointer-events: none;
 }
