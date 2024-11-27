@@ -17,7 +17,7 @@ let fidelity = 1;
 const zoomStepSpeed = 1.25;
 let zoomStep = 10;
 
-const workerCount = navigator.hardwareConcurrency;
+const workerCount = navigator.hardwareConcurrency * 10;
 const workers = [];
 let completedCount = 0;
 
@@ -58,10 +58,6 @@ function updateBox(event) {
 
 		box.style.width = window.innerWidth / zoomStep + "px";
 		box.style.height = window.innerHeight / zoomStep + "px";
-
-		box.style.backgroundColor = "transparent";
-	} else {
-		box.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
 	}
 }
 
@@ -102,8 +98,9 @@ function createWorker(start, end) {
 
 		if (completedCount == workerCount) {
 			completedCount = 0;
-
 			rendering = false;
+
+			state.textContent = "IDLE";
 
 			updateBox();
 		}
@@ -114,8 +111,12 @@ function createWorker(start, end) {
 
 // dispatch threads
 
+const state = document.getElementById("state");
+
 function render() {
 	rendering = true;
+	
+	state.textContent = "RENDERING...";
 
 	workers.forEach(worker => {
 		worker.terminate();
@@ -128,7 +129,7 @@ function render() {
 	for (let i = 0; i < workerCount; i++) {
 		const start = i * size;
 		const end = Math.min((i + 1) * size, canvas.height);
-	
+
 		createWorker(start, end);
 	}
 }

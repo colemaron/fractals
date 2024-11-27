@@ -15,25 +15,29 @@ self.onmessage = event => {
 
 			// get iterations
 
-			let x1 = 0;
-			let y1 = 0;
+			let zx = 0;
+			let zy = 0;
 
 			let i = 0;
 
-			while (x1 * x1 + y1 * y1 < 4 && i < maxIterations) {
-				const x2 = x1 * x1 - y1 * y1 + cx * ratio;
-				y1 = 2 * x1 * y1 + cy;
-				x1 = x2;
+			while (zx * zx + zy * zy < 4 && i < maxIterations) {
+				const x2 = zx * zx - zy * zy + cx * ratio;
+				zy = 2 * zx * zy + cy;
+				zx = x2;
 
-				++i;
+				i++;
 			}
 
 			// apply color
 
-			const terminated = i === maxIterations ? 0 : 1;
-			const t = i / maxIterations * maxIterations;
+			const m = i == maxIterations ? 0 : 255;
+			const t = i / 10;
 
-			const color = [t, t / 5, 0, 255];
+			const r = Math.sin(t + 1) * m;
+			const g = Math.sin(t + 2) * m;
+			const b = Math.sin(t + 3.2) * m;
+
+			const color = [r, g, b, 255];
 			
 			result.push({ x, y, color });
 		}
