@@ -1,49 +1,64 @@
-import { Vec2 } from "./Vector.js";
+import { Vec2 } from "./vector.js";
 
 // set up canvas
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d", {
+	imageSmoothingEnabled: false,
 	willReadFrequently: true,
+	alpha: false,
 });
 
 // zoom rendering
 
 const box = document.getElementById("box");
 
+// elements
+
+const iterations = document.getElementById("iterations");
+const resolution = document.getElementById("resolution");
+
 // constants
 
-let maxIterations = 1000;
-let fidelity = 1;
+let maxIterations = iterations.value;
+let fidelity = resolution.value;
 
 const zoomStepSpeed = 1.25;
 let zoomStep = 10;
 
-const workerCount = navigator.hardwareConcurrency;
+const workerCount = navigator.hardwareConcurrency / 2;
 const workers = [];
 let completedCount = 0;
 
 // view
 
-let zoom = 1;
-let offset = new Vec2(-1.5437 + 0.75, 0);
+let zoom = 0.5;
+let offset = new Vec2(-0.5, 0);
 
 // resize canvas
 
 let size = new Vec2();
 
-function resize() {
+function scale() {
 	const save = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-	size.x = canvas.width = window.innerWidth * fidelity;
-	size.y = canvas.height = window.innerHeight * fidelity;
+	canvas.width = size.x;
+	canvas.height = size.y;
 
 	ctx.putImageData(save, 0, 0);
+}
+
+function resize() {
+	size.replace(
+		Math.round(window.innerWidth * fidelity),
+		Math.round(window.innerHeight * fidelity)
+	)
 }
 
 window.onresize = resize;
 
 resize();
+scale();
 
 // mouse move for zoom
 
@@ -77,29 +92,15 @@ function createWorker(start, end) {
 	});
 
 	worker.onmessage = event => {
-		const image = ctx.createImageData(size.x, end - start);
-
-		event.data.forEach(({ x, y, color }) => {
-			const i = ((y - start) * size.x + x) * 4;
-
-			image.data[i + 0] = color[0];
-			image.data[i + 1] = color[1];
-			image.data[i + 2] = color[2];
-			image.data[i + 3] = color[3];
-		});
-
-		ctx.putImageData(image, 0, start);
+		ctx.putImageData(event.data, 0, start);
+		worker.terminate();
 
 		completedCount++;
 
 		if (completedCount == workerCount) {
 			completedCount = 0;
 			state.textContent = "IDLE";
-
-			updateBox();
 		}
-
-		worker.terminate();
 	}
 }
 
@@ -108,11 +109,13 @@ function createWorker(start, end) {
 const state = document.getElementById("state");
 
 function render() {
-	// reset workers
+	// reset values
 
 	workers.forEach(worker => worker.terminate());
 	workers.length = 0;
 	completedCount = 0;
+
+	scale();
 
 	// dispatch workers
 	
@@ -120,11 +123,11 @@ function render() {
 
 	const step = Math.ceil(size.y / workerCount);
 
-	for (let y = 0; y < workerCount; y++) {
-		const start = y * step;
-		const end = Math.min((y + 1) * step, size.y);
-
-		createWorker(start, end);
+	for (let y = 0; y < size.y; y += step) {
+		createWorker(
+			y,
+			Math.min(y + step, size.y)
+		);
 	}
 }
 
@@ -167,9 +170,7 @@ canvas.addEventListener("wheel", event => {
 // force re-render
 
 document.addEventListener("keydown", event => {
-	if (event.key == "r") {
-		render();
-	}
+	if (event.key == "r") { render() }
 })
 
 // disable right click
@@ -181,9 +182,6 @@ document.addEventListener("contextmenu", function (event) {
 // slider values
 
 const info = document.getElementById("info");
-
-const iterations = document.getElementById("iterations");
-const resolution = document.getElementById("resolution");
 
 function updateSliders() {
 	maxIterations = iterations.value;

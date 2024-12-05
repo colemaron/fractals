@@ -27,11 +27,9 @@ canvas {
 
 #box {
 	position: fixed;
-	top: 0;
-	left: 0;
 	translate: -50% -50%;
 	
-	border: 2px solid white;
+	border: 1px solid white;
 
 	pointer-events: none;
 }
@@ -43,7 +41,7 @@ canvas {
 	display: grid;
 	grid-template-columns: repeat(3, max-content);
 	align-items: center;
-	gap: 1rem 1rem;
+	gap: 1rem;
 
 	backdrop-filter: blur(10px);
 	border-bottom-right-radius: 1rem;
@@ -52,13 +50,14 @@ canvas {
 	border-left: none;
 	border-top: none;
 
-	:nth-child(3n - 2):not(:is(h4)) {
+	p {
 		text-align: right;
 	}
 
 	h4 {
+		padding: 1rem;
+		padding-top: 0;
 		text-align: center;
-		padding-bottom: 1rem;
 		border-bottom: 1px solid white;
 	}
 }
