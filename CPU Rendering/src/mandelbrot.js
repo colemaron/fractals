@@ -5,7 +5,6 @@ self.onmessage = event => {
 
 	// get constants
 
-	const ratio = size.x / size.y;
 	const scale = 2 / zoom;
 	const twoScale = scale / 2;
 
@@ -42,21 +41,13 @@ self.onmessage = event => {
 
 			// apply color based on iterations
 
-			const m = i == maxIterations ? 0 : 255;
 			const t = i / 10;
+			const j = ((y - start) * size.x + x) * 4;
 
-			const color = [
-				Math.sin(t + 4) * m,
-				Math.sin(t + 5) * m,
-				Math.sin(t + 6) * m,
-				255,
-			];
-
-			// set pixel color
-
-			const flatPixelIndex = ((y - start) * size.x + x) * 4;
-
-			pixels.set(color, flatPixelIndex);
+			pixels[j + 0] = Math.sin(t + 4) * 255;
+			pixels[j + 1] = Math.sin(t + 5) * 255;
+			pixels[j + 2] = Math.sin(t + 6) * 255;
+			pixels[j + 3] = 255;
 		}
 	}
 

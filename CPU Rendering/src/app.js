@@ -1,6 +1,13 @@
+import { Clock } from "./clock.js";
 import { Vec2 } from "./vector.js";
 
-// set up canvas
+// elements
+
+const box = document.getElementById("box");
+const iterations = document.getElementById("iterations");
+const resolution = document.getElementById("resolution");
+
+// initialize
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d", {
@@ -9,14 +16,7 @@ const ctx = canvas.getContext("2d", {
 	alpha: false,
 });
 
-// zoom rendering
-
-const box = document.getElementById("box");
-
-// elements
-
-const iterations = document.getElementById("iterations");
-const resolution = document.getElementById("resolution");
+const clock = new Clock();
 
 // constants
 
@@ -26,7 +26,7 @@ let fidelity = resolution.value;
 const zoomStepSpeed = 1.25;
 let zoomStep = 10;
 
-const workerCount = navigator.hardwareConcurrency / 2;
+const workerCount = navigator.hardwareConcurrency;
 const workers = [];
 let completedCount = 0;
 
@@ -100,6 +100,12 @@ function createWorker(start, end) {
 		if (completedCount == workerCount) {
 			completedCount = 0;
 			state.textContent = "IDLE";
+
+			// measure render duration
+
+			const measure = clock.stop("render");
+
+			console.log(measure.duration);
 		}
 	}
 }
@@ -109,6 +115,8 @@ function createWorker(start, end) {
 const state = document.getElementById("state");
 
 function render() {
+	clock.start("render");
+
 	// reset values
 
 	workers.forEach(worker => worker.terminate());
