@@ -46,6 +46,9 @@ class Clock {
 		entry.measures++;
 		entry.duration = this.now - entry.start;
 
+		entry.total += entry.duration;
+		entry.average = entry.total / entry.measures;
+
 		return entry;
 	}
 }

@@ -1,7 +1,7 @@
 class Vec2 {
 	// constructors
 
-	constructor(x = 0, y = x) {
+	constructor(x, y) {
 		this.x = x; this.y = y;
 	}
 
@@ -86,10 +86,14 @@ class Vec2 {
 		return this.x === v.x && this.y === v.y;
 	}
 
-	replace(x = 0, y = x) {
-		this.x = x; this.y = y;
+	// swap components
 
-		return this;
+	replace(x, y) {
+		this.x = x; this.y = y;
+	}
+
+	zero() {
+		this.x = 0; this.y = 0;
 	}
 
 	// attributes
@@ -116,7 +120,7 @@ class Vec2 {
 class Vec3 {
 	// constructors
 
-	constructor(x = 0, y = x, z = y) {
+	constructor(x , y , z ) {
 		this.x = x; this.y = y; this.z = z;
 	}
 	
@@ -208,7 +212,7 @@ class Vec3 {
 		return this.x === v.x && this.y === v.y && this.z === v.z;
 	}
 
-	replace(x = 0, y = x, z = y) {
+	replace(x, y, z) {
 		this.x = x; this.y = y; this.z = z;
 
 		return this;

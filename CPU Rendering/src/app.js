@@ -105,7 +105,7 @@ function createWorker(start, end) {
 
 			const measure = clock.stop("render");
 
-			console.log(measure.duration);
+			console.log(measure.average);
 		}
 	}
 }
