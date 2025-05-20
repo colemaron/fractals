@@ -8,6 +8,8 @@ self.onmessage = event => {
 	const scale = 2 / zoom;
 	const twoScale = scale / 2;
 
+	const ratio = size.x / size.y;
+
 	// create pixel array
 
 	const height = end - start;
@@ -31,6 +33,8 @@ self.onmessage = event => {
 				x / size.x * scale - twoScale + offset.x,
 				y / size.y * scale - twoScale + offset.y
 			);
+
+			c.x *= ratio;
 
 			// iterate
 

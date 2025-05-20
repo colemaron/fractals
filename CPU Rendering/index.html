@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<title>CPU Rendering Fractal</title>
 
 	<link rel="icon" href="https://www.google.com/favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="styles.css">
@@ -19,6 +19,9 @@
 		<h4>Name</h4>
 		<h4>Operation</h4>
 		<h4>Value</h4>
+
+		<p>Status</p>
+		<output style="grid-column: span 2;" id="state">IDLE</output>
 		
 		<p>Iterations</p>
 		<input id="iterations" type="range" value="1000" step="1000" min="1000" max="100000">
@@ -27,13 +30,14 @@
 		<p>Resolution</p>
 		<input id="resolution" type="range" value="1" step="0.1" min="0.1" max="1">
 		<output>N/A not updated</output>
-
-		<p>Status</p>
-		<output style="grid-column: span 2;" id="state">IDLE</output>
+		
+		<p>Threads</p>
+		<input id="threads" type="range" value="1" step="1" min="1" max="1">
+		<output>N/A not updated</output>
 
 		<!-- KEYBINDS -->
 
-		<!-- <h4>Name</h4>
+		<h4>Name</h4>
 		<h4>Bind</h4>
 		<h4>Action</h4>
 
@@ -47,7 +51,11 @@
 
 		<p>Render</p>
 		<p>R</p>
-		<p>Re-renders view</p> -->
+		<p>Re-renders view</p>
+
+		<p>GUI</p>
+		<p>H</p>
+		<p>Toggles GUI</p>
 	</div>
 </body>
 </html>

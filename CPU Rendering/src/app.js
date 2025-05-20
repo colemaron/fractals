@@ -6,8 +6,11 @@ import { Vec2 } from "./vector.js";
 const box = document.getElementById("box");
 const iterations = document.getElementById("iterations");
 const resolution = document.getElementById("resolution");
+const threads = document.getElementById("threads");
 
 // initialize
+
+threads.max = navigator.hardwareConcurrency;
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d", {
@@ -22,11 +25,11 @@ const clock = new Clock();
 
 let maxIterations = iterations.value;
 let fidelity = resolution.value;
+let workerCount = threads.value;
 
 const zoomStepSpeed = 1.25;
 let zoomStep = 10;
 
-const workerCount = navigator.hardwareConcurrency;
 const workers = [];
 let completedCount = 0;
 
@@ -178,7 +181,12 @@ canvas.addEventListener("wheel", event => {
 // force re-render
 
 document.addEventListener("keydown", event => {
-	if (event.key == "r") { render() }
+	if (event.key == "r") {
+		render()
+	} else if (event.key == "h") {
+		info.classList.toggle("disabled");
+		box.classList.toggle("disabled");
+	}
 })
 
 // disable right click
@@ -194,9 +202,11 @@ const info = document.getElementById("info");
 function updateSliders() {
 	maxIterations = iterations.value;
 	fidelity = resolution.value;
+	workerCount = threads.value;
 
 	iterations.nextElementSibling.textContent = iterations.value;
 	resolution.nextElementSibling.textContent = resolution.value;
+	threads.nextElementSibling.textContent = threads.value;
 
 	resize();
 }

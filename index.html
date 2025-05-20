@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			justify-content: center;
+			gap: 1rem;
+
+			background-color: #111;
+
+			height: 100vh;
+		}
+
+		a {
+			font-family: Poppins;
+			
+			color: white;
+			text-decoration: none;
+			background-color: #3873b4;
+			cursor: pointer;
+
+			padding: 1rem;
+			border-radius: 0.5rem;
+
+			&:hover {
+				outline: 3px solid white;
+			}
+		}
+	</style>
+</head>
+<body>
+	<a href="./CPU Rendering/index.html">CPU Rendering (slow but higher detail)</a>
+	<a href="./GPU Rendering/index.html">GPU Rendering (real time but low detail)</a>
+</body>
+</html>

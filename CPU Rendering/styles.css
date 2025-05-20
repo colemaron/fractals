@@ -61,3 +61,9 @@ canvas {
 		border-bottom: 1px solid white;
 	}
 }
+
+/* js disabled */
+
+.disabled {
+	display: none !important;
+}
